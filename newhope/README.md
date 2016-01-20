@@ -1,11 +1,11 @@
-# It's painful to use Common Lisp to build web spiders.
+## It's painful to use Common Lisp to build web spiders.
 
 * Drakma does not support some character encoding such as: GBK, this makes Chinese user crazy.
 * Some Common Lisp implements can't handle Threads very well (and SBCL's ```with-timeout``` won't work normally when ```burgled-batteries``` is loaded).
 * You'll always have to handle some special characters in the web page, which makes your HTML Parser stop working.
 * ......
 
-# I love lisp so much, but now, the love hurts me.
+## I love lisp so much, but now, the love hurts me.
 
 * Common Lisp is awesome, no doubt, but...
 * The community is small, you can't always find the stable packages you need.
@@ -15,7 +15,7 @@
 
 * If you wana use Common Lisp, use it as a brain, not hands or legs.
 
-# Clojure, oh clojure
+## Clojure, oh clojure
 
 * Clojure is ugly.
 * It has the same problem as Common Lisp, lack of packages.
@@ -24,7 +24,7 @@
 * It's still a place to build wheels, wonderful or not, I can't say.
 * I won't use it, for now.
 
-# Then what?
+## Then what?
 
 * Use Python for scripting, it's your suit armor.
 * Use Node.js for HTML / JSON generating, it's your nice dress.
