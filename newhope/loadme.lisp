@@ -1,0 +1,5 @@
+(declaim (optimize (debug 3)))
+(pushnew *default-pathname-defaults* asdf:*central-registry*)
+(ql:quickload '(newhope swank))
+(swank:create-server)
+(newhope:start-all-requests)
