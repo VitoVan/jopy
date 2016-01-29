@@ -7,10 +7,12 @@ conn.autocommit = True
 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 def find_job(job_id):
-    return cursor.execute('select  * from job where id = %s', (job_id,))
+    cursor.execute('select  * from job where id = %s', (job_id,))
+    return cursor.fetchall()
 
 def find_company(company_name):
-    return cursor.execute('select  * from company where name = %s', (company_name,))
+    cursor.execute('select  * from company where name = %s', (company_name,))
+    return cursor.fetchall()
 
 def insert_data(table, data):
     sql_str = 'insert into ' + table + ' (' + \

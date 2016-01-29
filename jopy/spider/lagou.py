@@ -18,7 +18,11 @@ class Lagou:
 
     def parse_list(self, url, pn = 1):
         params = {'first': 'false', 'pn': str(pn), 'kd':''}
-        r = requests.post(url, data=params, timeout=5)
+        try:
+            r = requests.post(url, data=params, timeout=5)
+        except requests.exceptions.Timeout:
+            print('Read list timeout')
+            return -1
         print('------------------- NOW PAGE: ' + str(pn))
         if self.parse_list_json(r.json()) == 0:
             self.parse_list(url, pn = pn + 1)
@@ -53,7 +57,11 @@ class Lagou:
             print('J-S')
         else:
             r_url = self.job_url.replace('#ID#',job_id)
-            r = requests.get(r_url)
+            try:
+                r = requests.get(r_url, timeout=5)
+            except requests.exceptions.Timeout:
+                print('Read job timeout')
+                return -1
             info_dict = html_to_dict(r.text,
                          [
                              {
@@ -107,7 +115,11 @@ class Lagou:
             print('C-S')
         else:
             r_url = self.company_url.replace('#ID#',company_id)
-            r = requests.get(r_url)
+            try:
+                r = requests.get(r_url, timeout=5)
+            except requests.exceptions.Timeout:
+                print('Read company timeout')
+                return -1
             info_dict = html_to_dict(r.text,
                          [
                              {
