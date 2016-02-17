@@ -5,6 +5,7 @@ from utils import *
 class Spider:
     base_url = 'http://www.neitui.me/?name=neitui&handle=lists&kcity='
     prefix = 'neitui'
+    skipped = False
 
     def __init__(self, city, max_page = 10):
         self.city = city
@@ -15,7 +16,7 @@ class Spider:
         self.parse_list(url)
 
     def parse_list(self, url, pn = 1):
-        if pn > self.max_page:
+        if pn > self.max_page and self.skipped:
             print('Out of pn: ' + str(pn) + ', exit')
             return -2
         try:
@@ -23,7 +24,7 @@ class Spider:
         except requests.exceptions.Timeout:
             print('Read list timeout')
             return -1
-        print('------------------- NOW PAGE: ' + str(pn))
+        print(self.prefix + '------------------- NOW PAGE: ' + str(pn))
         if self.parse_list_html(r.text) == 0:
             self.parse_list(url, pn = pn + 1)
 
@@ -71,6 +72,7 @@ class Spider:
         records = find_job(self.prefix + '_' + job_id)
         if len(records) > 0:
             update_job([datetime.datetime.now(), self.prefix + '_' + job_id,])
+            self.skipped = True
             print('J-*')
         elif info_dict['job_url'] != '':
             try:

@@ -5,6 +5,7 @@ from utils import *
 class Spider:
     base_url = 'http://search.51job.com/jobsearch/search_result.php?funtype=0100,2400,2500,2600,2700&ord_field=1&jobarea='
     prefix = 'woou'
+    skipped = False
 
     def __init__(self, city, max_page = 10):
         r = requests.get('http://js.51jobcdn.com/in/js/2009/jobarea_array_c.js')
@@ -18,7 +19,7 @@ class Spider:
         self.parse_list(url)
 
     def parse_list(self, url, pn = 1):
-        if pn > self.max_page:
+        if pn > self.max_page and self.skipped:
             print('Out of pn: ' + str(pn) + ', exit')
             return -2
         try:
@@ -28,16 +29,17 @@ class Spider:
         except requests.exceptions.Timeout:
             print('Read list timeout')
             return -1
-        print('------------------- NOW PAGE: ' + str(pn))
+        print(self.prefix + '------------------- NOW PAGE: ' + str(pn))
         if self.parse_list_html(r.text) == 0 or pn == 1:
             self.parse_list(url, pn = pn + 1)
 
     def parse_list_html(self, list_html):
-        for single_html in html_split(list_html,'#resultList > div.el:not(.mk)'):
+        html_list = html_split(list_html,'#resultList > div.el:not(.mk)')
+        for single_html in html_list:
             if self.parse_single_html(single_html) == -1:
                 print('Out of date, stop.')
                 return -1
-        if len(html_split(list_html, 'li.bk > a[href]')) == 2:
+        if len(html_split(list_html, 'li.bk > a[href]')) == 2 and len(html_list) > 0:
             return 0
         else:
             print('No further page, stop.')
@@ -84,6 +86,7 @@ class Spider:
         records = find_job(self.prefix + '_' + info_dict['job_id'])
         if len(records) > 0:
             update_job([datetime.datetime.now(), self.prefix + '_' + job_id,])
+            self.skipped = True
             print('J-*')
         elif info_dict['job_url'] != '':
             try:

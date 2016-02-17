@@ -20,5 +20,3 @@ neitui_thread.join()
 woou_thread.join()
 
 print('All systems done.')
-
-
