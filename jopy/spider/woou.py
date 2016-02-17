@@ -2,21 +2,25 @@ import datetime, requests, json, psycopg2, psycopg2.extras, re, ast
 from collections import defaultdict
 from utils import *
 
-class Woou:
+class Spider:
     base_url = 'http://search.51job.com/jobsearch/search_result.php?funtype=0100,2400,2500,2600,2700&ord_field=1&jobarea='
     prefix = 'woou'
 
-    def __init__(self, city):
+    def __init__(self, city, max_page = 10):
         r = requests.get('http://js.51jobcdn.com/in/js/2009/jobarea_array_c.js')
         self.city_dict = {y:x for x,y in ast.literal_eval('{' + re.sub('\]=', ':', re.sub(';', ',', re.sub('var ja=\[\];|ja\[|\r\n', '', r.text))) + '}').items()}
         self.city_code = self.city_dict[city]
         self.city = city
+        self.max_page = max_page
 
     def start_request(self):
         url = self.base_url + self.city_code
         self.parse_list(url)
 
     def parse_list(self, url, pn = 1):
+        if pn > self.max_page:
+            print('Out of pn: ' + str(pn) + ', exit')
+            return -2
         try:
             cookies = dict(guide = '1')
             r = requests.get(url + '&curr_page=' + str(pn), timeout=5, cookies=cookies)
@@ -76,11 +80,10 @@ class Woou:
         fuck_dict = info_dict
         if info_dict['create_date'] != datetime.datetime.now().strftime("%m-%d"):
             return -1
-        print(info_dict['position_name'] + ' - ' + info_dict['company_name'] + ' - ' + self.city + ' - ' + info_dict['create_date'])
+        print(self.prefix + ' - // ' + info_dict['position_name'] + ' - ' + info_dict['company_name'] + ' - ' + self.city + ' - ' + info_dict['create_date'])
         records = find_job(self.prefix + '_' + info_dict['job_id'])
         if len(records) > 0:
-            cursor.execute('update job set update_date = %s, update_count = update_count + 1 where id = %s',
-                           [datetime.datetime.now(), self.prefix + '_' + info_dict['job_id'],])
+            update_job([datetime.datetime.now(), self.prefix + '_' + job_id,])
             print('J-*')
         elif info_dict['job_url'] != '':
             try:

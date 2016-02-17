@@ -4,20 +4,26 @@ from collections import defaultdict
 
 conn = psycopg2.connect("dbname=whereisjob user=whereisjob password=123456")
 conn.autocommit = True
-cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 def find_job(job_id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('select  * from job where id = %s', (job_id,))
     return cursor.fetchall()
 
 def find_company(company_name):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('select  * from company where name = %s or short_name = %s', (company_name, company_name))
     return cursor.fetchall()
+
+def update_job(job_id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('update job set update_date = %s, update_count = update_count + 1 where id = %s', job_id)
 
 def insert_data(table, data):
     sql_str = 'insert into ' + table + ' (' + \
               ','.join(data.keys()) + ') values (' + \
               ','.join('%s' for x in data.keys()) + ')'
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute(sql_str, [x for x in data.values()])
     
 def select_to_text(soup, selector, attribute=None, contains=None):

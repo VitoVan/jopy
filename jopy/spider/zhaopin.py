@@ -2,21 +2,22 @@ import datetime, requests, json, psycopg2, psycopg2.extras, re
 from collections import defaultdict
 from utils import *
 
-class Zhaopin:
+class Spider:
     base_url = 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&sm=1&jl='
     job_url = 'http://jobs.zhaopin.com/#ID#.htm'
     prefix = 'zhaopin'
 
-    def __init__(self, city):
+    def __init__(self, city, max_page = 10):
         self.city = city
+        self.max_page = max_page
 
     def start_request(self):
         url = self.base_url + self.city
         self.parse_list(url)
 
     def parse_list(self, url, pn = 1):
-        if pn > 90:
-            print('Out of pn: 90, exit')
+        if pn > self.max_page:
+            print('Out of pn: ' + str(pn) + ', exit')
             return -2
         try:
             r = requests.get(url + '&p=' + str(pn), timeout=5)
@@ -58,11 +59,10 @@ class Zhaopin:
         if info_dict['create_date'] != datetime.datetime.now().strftime("%m-%d"):
             return -1
         job_id = re.sub('http://jobs.zhaopin.com/|.htm|.*_','',info_dict['job_url'])
-        print(info_dict['position_name'] + ' - ' + info_dict['company_name'] + ' - ' + self.city + ' - ' + info_dict['create_date'])
+        print(self.prefix + ' - // ' + info_dict['position_name'] + ' - ' + info_dict['company_name'] + ' - ' + self.city + ' - ' + info_dict['create_date'])
         records = find_job(self.prefix + '_' + job_id)
         if len(records) > 0:
-            cursor.execute('update job set update_date = %s, update_count = update_count + 1 where id = %s',
-                           [datetime.datetime.now(), self.prefix + '_' + job_id,])
+            update_job([datetime.datetime.now(), self.prefix + '_' + job_id,])
             print('J-*')
         elif info_dict['job_url'] != '':
             try:
