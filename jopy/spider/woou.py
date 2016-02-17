@@ -29,7 +29,7 @@ class Woou:
             self.parse_list(url, pn = pn + 1)
 
     def parse_list_html(self, list_html):
-        for single_html in html_split(list_html,'#resultList > div[class="el"]'):
+        for single_html in html_split(list_html,'#resultList > div.el:not(.mk)'):
             if self.parse_single_html(single_html) == -1:
                 print('Out of date, stop.')
                 return -1
@@ -40,6 +40,8 @@ class Woou:
             return -2
         
     def parse_single_html(self, single_html):
+        global fuck_html
+        fuck_html = single_html
         info_dict = html_to_dict(single_html,
                                  [
                                      {
@@ -58,7 +60,7 @@ class Woou:
                                      },
                                      {
                                          'name': 'position_name',
-                                         'selector': 'p.t1> a[href^="http://jobs.51job.com/"]'
+                                         'selector': 'p.t1 > a[href^="http://jobs.51job.com/"]'
                                      },
                                      {
                                          'name': 'company_name',
@@ -121,8 +123,12 @@ class Woou:
         salary_range = defaultdict(lambda: 0, (enumerate(re.findall('\d+', info_dict['salary']))))
         work_year_range = defaultdict(lambda: 0, (enumerate(re.findall('\d+', info_dict['work_year']))))
         # get numbers
-        info_dict['min_salary'] = int(salary_range[0])
-        info_dict['max_salary'] = int(salary_range[1])
+        salary_factor = 1
+        if '年' in info_dict['salary']:
+            salary_factor = 10000/12
+        info_dict['min_salary'] = int(salary_range[0]) * salary_factor
+        info_dict['max_salary'] = int(salary_range[1]) * salary_factor
+        
         info_dict['min_work_year'] = int(work_year_range[0])
         info_dict['max_work_year'] = int(work_year_range[1])
         # del raw data
