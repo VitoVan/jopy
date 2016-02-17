@@ -11,7 +11,7 @@ def find_job(job_id):
     return cursor.fetchall()
 
 def find_company(company_name):
-    cursor.execute('select  * from company where name = %s', (company_name,))
+    cursor.execute('select  * from company where name = %s or short_name = %s', (company_name, company_name))
     return cursor.fetchall()
 
 def insert_data(table, data):
@@ -45,6 +45,12 @@ def select_to_text(soup, selector, attribute=None, contains=None):
     else:
         return ''
 
+
+def html_split(html, selector):
+    soup = BeautifulSoup(html)
+    elements = soup.select(selector)
+    return list(map(str, elements))
+    
 def html_to_dict(html,selector_dict):
     result_dict = {}
     soup = BeautifulSoup(html)
@@ -54,5 +60,10 @@ def html_to_dict(html,selector_dict):
         selector_str = selector['selector']
         attribute = selector['attribute']
         contains = selector['contains']
-        result_dict[name] = select_to_text(soup, selector_str, attribute, contains).strip()
+        func = selector['lambda']
+        raw_result = select_to_text(soup, selector_str, attribute, contains).strip()
+        if func:
+            result_dict[name] = func(raw_result, result_dict)
+        else:
+            result_dict[name] = raw_result
     return result_dict

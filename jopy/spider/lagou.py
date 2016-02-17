@@ -1,7 +1,6 @@
 import datetime, requests, json, psycopg2, psycopg2.extras, re
-from bs4 import BeautifulSoup
 from collections import defaultdict
-from utils import insert_data, html_to_dict, find_job, find_company
+from utils import *
 
 class Lagou:
     base_url = 'http://www.lagou.com/jobs/positionAjax.json?px=new&city='
@@ -90,10 +89,10 @@ class Lagou:
             salary_range = defaultdict(lambda: 0, (enumerate(re.findall('\d+', info_dict['salary']))))
             work_year_range = defaultdict(lambda: 0, (enumerate(re.findall('\d+', info_dict['work_year']))))
             # get numbers
-            info_dict['min_salary'] = salary_range[0]
-            info_dict['max_salary'] = salary_range[1]
-            info_dict['min_work_year'] = work_year_range[0]
-            info_dict['max_work_year'] = work_year_range[1]
+            info_dict['min_salary'] = int(salary_range[0]) * 1000
+            info_dict['max_salary'] = int(salary_range[1]) * 1000
+            info_dict['min_work_year'] = int(work_year_range[0])
+            info_dict['max_work_year'] = int(work_year_range[1])
             # del raw data
             del info_dict['salary']
             del info_dict['work_year']
