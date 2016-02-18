@@ -4,18 +4,45 @@ from collections import defaultdict
 
 conn = psycopg2.connect("dbname=whereisjob user=whereisjob password=123456")
 conn.autocommit = True
+AMAP_KEY = os.environ['AMAP_KEY']
+AMAP_JOB_TABLEID = os.environ['AMAP_JOB_TABLEID']
+AMAP_COMPANY_TABLEID = os.environ['AMAP_COMPANY_TABLEID']
 
 def get_gps(city, address):
-    AMAP_KEY = os.environ['AMAP_KEY']
     print('getting location: ' + city + ' - ' + address + '\n')
     r = requests.get('http://restapi.amap.com/v3/geocode/geo?key='+ AMAP_KEY +'&address=' + address + '&city=' + city)
     result = r.json()
     try:
         return result['geocodes'][0]['location']
-    except KeyError:
+    except:
         return '-1'
-    
 
+def insert_map_data(data):
+    if data['location'] == '-1' or data['location'] == ',':
+        return -1
+    final_data = {
+        '_name' : data['title'] if 'title' in data else data['name'],
+        '_location' : data['location'],
+        '_address' : data['address'],
+        'coordtype' : 'autonavi'
+    }
+    del data['raw_data']
+    del data['location']
+    del data['address']
+    del data['update_date']
+    final_data.update(data)
+    payload = {
+        'key' : AMAP_KEY,
+        'tableid': AMAP_JOB_TABLEID if 'title' in data else AMAP_COMPANY_TABLEID,
+        'loctype': '1',
+        'data': str(final_data)
+    }
+    r = requests.post('http://yuntuapi.amap.com/datamanage/data/create', data = payload)
+    if r.json()['status'] == 0:
+        print('POST RESULT: ' + r.text + '\n')
+        print(payload)
+    
+    
 def find_job(job_id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('select  * from job where id = %s', (job_id,))
@@ -36,6 +63,7 @@ def insert_data(table, data):
               ','.join('%s' for x in data.keys()) + ')'
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute(sql_str, [x for x in data.values()])
+    insert_map_data(data)
     
 def select_to_text(soup, selector, attribute=None, contains=None):
     if not selector:
