@@ -87,6 +87,10 @@ class Spider:
                                  'selector': '#container > div.content_r > dl > dd > div:nth-of-type(1)'
                              },
                              {
+                                 'name': 'location',
+                                 'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
+                             },
+                             {
                                  'name': 'description',
                                  'selector': '#container > div.content_l.fl > dl.job_detail > dd.job_bt'
                              }
@@ -141,6 +145,10 @@ class Spider:
                              {
                                  'name': 'address',
                                  'selector': 'ul > li > p.mlist_li_desc'
+                             },
+                             {
+                                 'name': 'location',
+                                 'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
                              },
                              {
                                  'name': 'website',

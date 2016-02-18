@@ -1,9 +1,20 @@
-import psycopg2, psycopg2.extras
+import psycopg2, psycopg2.extras, requests, os
 from bs4 import BeautifulSoup
 from collections import defaultdict
 
 conn = psycopg2.connect("dbname=whereisjob user=whereisjob password=123456")
 conn.autocommit = True
+
+def get_gps(city, address):
+    AMAP_KEY = os.environ['AMAP_KEY']
+    print('getting location: ' + city + ' - ' + address + '\n')
+    r = requests.get('http://restapi.amap.com/v3/geocode/geo?key='+ AMAP_KEY +'&address=' + address + '&city=' + city)
+    result = r.json()
+    try:
+        return result['geocodes'][0]['location']
+    except KeyError:
+        return '-1'
+    
 
 def find_job(job_id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -27,6 +38,8 @@ def insert_data(table, data):
     cursor.execute(sql_str, [x for x in data.values()])
     
 def select_to_text(soup, selector, attribute=None, contains=None):
+    if not selector:
+        return ''
     results = soup.select(selector)
     if len(results) > 0:
         if contains: 

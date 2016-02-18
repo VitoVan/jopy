@@ -114,6 +114,10 @@ class Spider:
                     'selector': '#J_Company_Default > div.company_description.clearfix > div.company_description_l > div:nth-of-type(1) > span:nth-of-type(2)'
                 },
                 {
+                    'name': 'location',
+                    'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
+                },
+                {
                     'name': 'website',
                     'selector': '#J_Company_Default > h3 > span > em > a'
                 }])
@@ -147,6 +151,10 @@ class Spider:
                              'name': 'address',
                              'selector': 'div.jobtitle>span.jobtitle-r',
                              'lambda': lambda rr,rd: re.sub('地点：','',rr).strip()
+                         },
+                         {
+                             'name': 'location',
+                             'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
                          },
                          {
                              'name': 'description',

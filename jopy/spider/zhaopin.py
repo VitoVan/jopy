@@ -97,6 +97,10 @@ class Spider:
                              'lambda': lambda rr,rd: re.sub('查看职位地图','',rr).strip()
                          },
                          {
+                             'name': 'location',
+                             'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
+                         },
+                         {
                              'name': 'description',
                              'selector': 'div.terminalpage.clearfix > div.terminalpage-left > div.terminalpage-main.clearfix > div > div:nth-of-type(1)',
                              'lambda': lambda rr,rd: re.sub('工作地址(.|\s)*','',rr).strip()
@@ -128,7 +132,7 @@ class Spider:
                      [
                          {
                              'name': 'short_name',
-                             'selector': 'body > div.terminalpage.clearfix > div.terminalpage-right > div.company-box > p > a'
+                             'selector': 'body > div.terminalpage.clearfix > div.terminalpage-right > div.company-box > p > a[rel="nofollow"]'
                          },
                          {
                              'name': 'name',
@@ -146,7 +150,13 @@ class Spider:
                          },
                          {
                              'name': 'address',
-                             'selector': 'div.terminalpage.clearfix > div.terminalpage-right > div.company-box > ul > li > strong'
+                             'selector': 'div.terminalpage.clearfix > div.terminalpage-right > div.company-box > ul > li',
+                             'contains': '公司地址',
+                             'lambda': lambda rr,rd: re.sub('公司地址：','',rr).strip()
+                         },
+                         {
+                             'name': 'location',
+                             'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
                          },
                          {
                              'name': 'website',

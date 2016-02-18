@@ -121,6 +121,10 @@ class Spider:
                              'lambda': lambda rr,rd: re.sub('上班地址：','',rr).strip()
                          },
                          {
+                             'name': 'location',
+                             'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
+                         },
+                         {
                              'name': 'description',
                              'selector': 'div.tCompany_center.clearfix > div.tCompany_main > div > div.job_msg',
                              'lambda': lambda rr,rd: re.sub('职位描述：|举报|分享','',rr).strip()
@@ -176,7 +180,11 @@ class Spider:
             {
                 'name': 'address',
                 'selector': 'div.tCompanyPage > div.tCompany_center.clearfix > div.tCompany_full > div > div > p.fp',
-                'lambda': lambda rr,rd: re.sub('公司地址：','', rr).strip()
+                'lambda': lambda rr,rd: re.sub('公司地址：|(邮编：.*)','', rr).strip()
+            },
+            {
+                'name': 'location',
+                'lambda': lambda rr,rd: get_gps(self.city, rd['address'])
             },
             {
                 'name': 'website',
