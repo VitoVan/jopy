@@ -8,8 +8,8 @@ var map = new AMap.Map("mapContainer", {
 AMap.event.addListener(map, 'complete', function(result) {
     map.getCity(function(city){
         city_name = city.city.substr(0,2)
-        if(city_name != '北京' && city_name != '上海' && city_name != '广州' && city_name != '郑州'){
-            alert('当前仅支持 北京、上海、广州、郑州， ' + city_name + ' 暂未开通。');
+        if(city_name != '北京' && city_name != '上海' && city_name != '杭州' && city_name != '郑州'){
+            alert('当前仅支持 北京、上海、杭州、郑州， ' + city_name + ' 暂未开通。');
             map.setCity('北京')
         }
     })
