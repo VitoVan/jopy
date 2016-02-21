@@ -4,6 +4,16 @@ var map = new AMap.Map("mapContainer", {
     features: ['point','road','building'],
     zoom: 12 //地图显示的缩放级别
 });
+
+AMap.event.addListener(map, 'complete', function(result) {
+    map.getCity(function(city){
+        city_name = city.city.substr(0,2)
+        if(city_name != '北京' || city_name != '上海' || city_name != '广州' || city_name != '郑州'){
+            alert('当前仅支持 北京、上海、广州、郑州， ' + city_name + ' 暂未开通。');
+            map.setCity('北京')
+        }
+    })
+});
 var cloudDataLayer = false;
 var keywords = '';
 var min_salary = 0;
@@ -25,6 +35,12 @@ function setAllPlaceholder(){
     setPlaceholder('min_salary', min_salary);
     setPlaceholder('max_salary', max_salary);
     setPlaceholder('work_year', work_year);
+}
+
+function inputKeydown(e){
+    if(event.keyCode == 13) {
+        searchData();
+    }
 }
 
 function searchData(){
@@ -57,6 +73,7 @@ function addCloudLayer() {
         };
         cloudDataLayer = new AMap.CloudDataLayer('56c526a5305a2a32880a1fed', layerOptions); //实例化云图层类
         cloudDataLayer.setMap(map); //叠加云图层到地图
+        
         AMap.event.addListener(cloudDataLayer, 'click', function(result) {
             var clouddata = result.data;
             var title = clouddata._name;
