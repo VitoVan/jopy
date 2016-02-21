@@ -1,4 +1,4 @@
-import psycopg2, psycopg2.extras, requests, os
+import psycopg2, psycopg2.extras, requests, os, time
 from bs4 import BeautifulSoup
 from collections import defaultdict
 
@@ -24,7 +24,8 @@ def insert_map_data(data):
         '_name' : data['title'] if 'title' in data else data['name'],
         '_location' : data['location'],
         '_address' : data['address'],
-        'coordtype' : 'autonavi'
+        'coordtype' : 'autonavi',
+        'timestamp': int(time.time())
     }
     del data['raw_data']
     del data['location']
@@ -41,7 +42,30 @@ def insert_map_data(data):
     if r.json()['status'] == 0:
         print('POST RESULT: ' + r.text + '\n')
         print(payload)
-    
+
+def update_map_job(job_id):
+    r = requests.get('http://yuntuapi.amap.com/datamanage/data/list?tableid='
+                     + AMAP_JOB_TABLEID + '&filter=id:' + job_id + '&limit=1&page=1&key=' + AMAP_KEY)
+    job_json = r.json()
+    try:
+        job_map_id = job_json['datas'][0]['_id']
+    except:
+        print(r.text)
+        return -1
+    data = {
+        "_id": job_map_id,
+        "timestamp": int(time.time())
+    }
+    payload = {
+        'key' : AMAP_KEY,
+        'tableid': AMAP_JOB_TABLEID,
+        'data': str(data).replace('\'','\"')
+    }
+    r = requests.post('http://yuntuapi.amap.com/datamanage/data/update', data = payload)
+    if r.json()['status'] == 0:
+        print('POST RESULT:' + r.text)
+        print(payload)
+        
     
 def find_job(job_id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -56,6 +80,7 @@ def find_company(company_name):
 def update_job(job_id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('update job set update_date = %s, update_count = update_count + 1 where id = %s', job_id)
+    update_map_job(job_id[1])
 
 def insert_data(table, data):
     sql_str = 'insert into ' + table + ' (' + \
