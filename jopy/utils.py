@@ -10,11 +10,14 @@ AMAP_COMPANY_TABLEID = os.environ['AMAP_COMPANY_TABLEID']
 
 def get_gps(city, address):
     print('getting location: ' + city + ' - ' + address + '\n')
-    r = requests.get('http://restapi.amap.com/v3/geocode/geo?key='+ AMAP_KEY +'&address=' + address + '&city=' + city)
+    r_url = 'http://restapi.amap.com/v3/geocode/geo?key='+ AMAP_KEY +'&address=' + address + '&city=' + city
+    r = requests.get(r_url)
     result = r.json()
     try:
         return result['geocodes'][0]['location']
     except:
+        print('LOCATION_ERROR:' + r.text)
+        print(r_url)
         return '-1'
 
 def insert_map_data(data):
@@ -42,15 +45,18 @@ def insert_map_data(data):
     if r.json()['status'] == 0:
         print('POST RESULT: ' + r.text + '\n')
         print(payload)
+    else:
+        print('===MAP_DATA_INSERTED===: ' + r.text)
 
 def update_map_job(job_id):
-    r = requests.get('http://yuntuapi.amap.com/datamanage/data/list?tableid='
-                     + AMAP_JOB_TABLEID + '&filter=id:' + job_id + '&limit=1&page=1&key=' + AMAP_KEY)
+    r_url = 'http://yuntuapi.amap.com/datamanage/data/list?tableid=' + AMAP_JOB_TABLEID + '&filter=id:' + job_id + '&limit=1&page=1&key=' + AMAP_KEY
+    r = requests.get(r_url)
     job_json = r.json()
     try:
         job_map_id = job_json['datas'][0]['_id']
     except:
-        print(r.text)
+        print('UPDATE_ERROR: ' + r.text)
+        print('URL:' + r_url)
         return -1
     data = {
         "_id": job_map_id,
@@ -65,6 +71,8 @@ def update_map_job(job_id):
     if r.json()['status'] == 0:
         print('POST RESULT:' + r.text)
         print(payload)
+    else:
+        print('===MAP_DATA_UPDATED---:' + r.text)
         
     
 def find_job(job_id):
