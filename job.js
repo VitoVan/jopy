@@ -21,7 +21,7 @@ var keywords = '';
 var min_salary = 0;
 var max_salary = 99999;
 var work_year = 99;
-var hours = 48*2;
+var hours = 48*4;
 
 function setPlaceholder(id, value){
     if(value !== ''){
