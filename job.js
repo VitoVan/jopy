@@ -8,10 +8,11 @@ var map = new AMap.Map("mapContainer", {
 AMap.event.addListener(map, 'complete', function(result) {
     map.getCity(function(city){
         city_name = city.city;
-        if(city_name.indexOf('北京')>-1 
-            && city_name.indexOf('上海')>-1 && city_name.indexOf('杭州')>-1 
-            && city_name.indexOf('郑州')>-1 && city_name.indexOf('哈尔滨')>-1 && city_name.indexOf('成都')>-1){
-            alert('当前仅支持 北京、上海、杭州、郑州、哈尔滨、成都， ' + city_name + ' 暂未开通。');
+        if(city_name.indexOf('北京')==-1 
+            && city_name.indexOf('上海')==-1 && city_name.indexOf('杭州')==-1 
+            && city_name.indexOf('广州')==-1 && city_name.indexOf('深圳')==-1
+            && city_name.indexOf('郑州')==-1 && city_name.indexOf('哈尔滨')==-1 && city_name.indexOf('成都')==-1){
+            alert('当前仅支持 北京、上海、杭州、郑州、哈尔滨、成都、广州、深圳， ' + city_name + ' 暂未开通。');
             map.setCity('北京')
         }
     })
