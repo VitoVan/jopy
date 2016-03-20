@@ -55,7 +55,7 @@ def update_map_job(job_id):
     try:
         job_map_id = job_json['datas'][0]['_id']
     except:
-        print('UPDATE_ERROR: ' + r.text)
+        print('DATA_NOT_FOUND: ' + r.text)
         print('URL:' + r_url)
         return -1
     data = {
@@ -72,7 +72,7 @@ def update_map_job(job_id):
         print('POST RESULT:' + r.text)
         print(payload)
     else:
-        print('===MAP_DATA_UPDATED---:' + r.text)
+        print('===MAP_DATA_UPDATED==:' + r.text)
         
     
 def find_job(job_id):

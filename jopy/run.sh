@@ -6,3 +6,5 @@ python jopy.py 哈尔滨
 python jopy.py 成都
 python jopy.py 郑州
 python jopy.py 深圳
+python jopy.py 济南
+python jopy.py 天津
